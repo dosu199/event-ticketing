@@ -34,3 +34,10 @@ TanStack Query · React Router · Tailwind · oidc-client-ts or keycloak-js · r
 - [ ] My tickets
 - [ ] Live seat updates
 - [ ] Organizer pages
+
+## Notes
+- Scaffolded with `npm create vite@latest . -- --template react-ts` ("Ignore files and continue").
+- TypeScript is pinned to `~6.0.0` because the Vite template's TypeScript 7 conflicts with
+  `typescript-eslint` 8.x (peer range `<6.1.0`). Upgrade both together once
+  typescript-eslint supports TS 7.
+- Run with `npm run dev -- --host` (`--host` is needed in Codespaces).
