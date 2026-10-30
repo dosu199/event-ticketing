@@ -2,6 +2,8 @@
 
 The heart of the system. Handles seat holds, bookings, and orchestrates the booking saga.
 
+> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+
 ## Owned data
 - **Redis:** seat holds `hold:{eventId}:{seatId}` → userId, TTL 10 min
 - **Postgres (`booking_db`):**

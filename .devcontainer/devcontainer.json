@@ -1,0 +1,44 @@
+{
+  "name": "event-ticketing",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "jdkDistro": "tem",
+      "installMaven": "true"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8080, 8081, 8082, 8083, 8084, 8085, 5173, 8180, 8025, 8090, 5432],
+  "portsAttributes": {
+    "8080": { "label": "api-gateway" },
+    "8081": { "label": "event-service" },
+    "8082": { "label": "booking-service" },
+    "8083": { "label": "payment-service" },
+    "8084": { "label": "ticket-service" },
+    "8085": { "label": "notification-service" },
+    "5173": { "label": "frontend" },
+    "8180": { "label": "keycloak" },
+    "8025": { "label": "mailpit" },
+    "8090": { "label": "kafka-ui" },
+    "5432": { "label": "postgres", "onAutoForward": "silent" }
+  },
+  "postCreateCommand": "cp -n .env.example .env || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-boot-dev-pack",
+        "ms-azuretools.vscode-containers",
+        "redhat.vscode-yaml",
+        "mikestead.dotenv"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic"
+      }
+    }
+  }
+}

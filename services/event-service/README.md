@@ -2,6 +2,8 @@
 
 Owns the event catalog: events, venues, seat layouts, prices.
 
+> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+
 ## Owned data (Postgres: `event_db`)
 - `venue`: name, address, seating layout (rows/seats or sections)
 - `event`: title, description, venue, start time, status (DRAFT/PUBLISHED/CANCELLED)

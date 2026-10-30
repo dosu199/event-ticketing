@@ -1,0 +1,30 @@
+# =============================================================
+# booking-service configuration
+# Spring Boot reads this file at startup. Any value can be overridden
+# by an environment variable (SERVER_PORT=9999) or a command-line
+# argument (--server.port=9999). Docker/K8s use that later.
+# =============================================================
+
+spring:
+  application:
+    # The service's logical name. It shows up in logs, metrics and traces,
+    # and the gateway can use it for routing.
+    name: booking-service
+
+server:
+  # Each service gets its own fixed port (see the port table in the root README)
+  # so they can all run on one machine at the same time.
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Actuator exposes only /actuator/health over HTTP by default.
+        # We also expose /actuator/info. Prometheus metrics come in Phase 6.
+        include: health,info
+  endpoint:
+    health:
+      # Show which components are UP/DOWN (db, disk, kafka...) in the health
+      # response. Fine locally. In production you'd restrict this.
+      show-details: always

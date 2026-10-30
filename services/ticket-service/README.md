@@ -2,6 +2,8 @@
 
 Issues tickets for confirmed bookings and validates them at the venue entrance.
 
+> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+
 ## Owned data (Postgres: `ticket_db`)
 - `ticket`: bookingId, seat, userId, code, status (VALID/USED/REVOKED)
 

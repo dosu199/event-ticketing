@@ -2,7 +2,8 @@
 
 A microservices learning project: users browse events, hold seats, pay, and receive a QR ticket by email.
 
-> **Status:** blueprint only. Nothing is implemented yet. Each folder has a `README.md` describing what belongs there and a checklist to work through.
+> **Status:** Phase 0 (setup) done: build, dev environment, and local infrastructure. No business logic yet.
+> Each folder has a `README.md` describing what belongs there. Each phase is explained in [`docs/phases/`](docs/phases/).
 
 ## Architecture
 
@@ -21,6 +22,28 @@ A microservices learning project: users browse events, hold seats, pay, and rece
           ◄──────── Kafka (async events) ────────►
 ```
 
+## Getting started (GitHub Codespaces)
+
+```bash
+# once: Ctrl/Cmd+Shift+P → "Codespaces: Rebuild Container" (applies .devcontainer)
+mvn -N wrapper:wrapper -Dmaven=3.9.11   # once: generate the Maven wrapper
+./mvnw verify                           # build all services + smoke tests
+make up && make ps                      # start infrastructure, check health
+./mvnw -pl services/event-service spring-boot:run
+```
+
+`make help` lists all shortcuts. Full walkthrough: [docs/phases/phase-0.md](docs/phases/phase-0.md).
+
+## Documentation
+
+| Doc | What it covers |
+|---|---|
+| [docs/phases/](docs/phases/) | One explained guide per roadmap phase: what was added and why |
+| [docs/adr/](docs/adr/) | Architecture Decision Records: every significant choice and its alternatives |
+| [docs/events.md](docs/events.md) | Event catalog |
+| [docs/architecture.md](docs/architecture.md) | Architecture notes |
+| `README.md` in each folder | What that folder/service is responsible for |
+
 ## Repository layout
 
 | Path | Purpose |
@@ -35,10 +58,13 @@ A microservices learning project: users browse events, hold seats, pay, and rece
 | `tests/load/`, `tests/e2e/` | k6 load tests, Playwright end-to-end tests |
 | `docs/` | Architecture notes, event catalog, ADRs |
 | `.github/workflows/` | CI pipelines |
+| `.devcontainer/` | Codespaces environment (Java 21, Maven, Node 22, Docker) |
+| `pom.xml` | Maven parent: shared versions and module list |
+| `Makefile`, `.env.example` | Command shortcuts, and the template for local secrets |
 
 ## Tech stack
 
-Java 21 · Spring Boot 3 · Spring Cloud Gateway · Spring Data JPA · Flyway · Spring Kafka · Resilience4j · PostgreSQL · Redis · Kafka (or Redpanda) · Keycloak · React + Vite + TypeScript · TanStack Query · Docker Compose · Testcontainers · Prometheus/Grafana · k6 · Playwright
+Java 21 · Spring Boot 4.1 · Spring Cloud 2025.1 · Spring Cloud Gateway · Spring Data JPA · Flyway · Spring Kafka · Resilience4j · PostgreSQL · Redis · Kafka (or Redpanda) · Keycloak · React + Vite + TypeScript · TanStack Query · Docker Compose · Testcontainers · Prometheus/Grafana · k6 · Playwright
 
 ## Local ports (planned)
 
@@ -54,16 +80,19 @@ Java 21 · Spring Boot 3 · Spring Cloud Gateway · Spring Data JPA · Flyway ·
 | Keycloak | 8180 |
 | Postgres | 5432 |
 | Redis | 6379 |
-| Kafka | 9092 |
+| Kafka | 9092 (host) / 29092 (inside Docker) |
+| Kafka UI | 8090 |
 | Mailpit UI / SMTP | 8025 / 1025 |
 | Grafana / Prometheus | 3000 / 9090 |
 
 ## Roadmap
 
-### Phase 0: Setup
-- [ ] Decide on a build tool (Maven multi-module or Gradle) and add the root build file
-- [ ] `infra/docker/docker-compose.yml` with Postgres, Redis, Kafka, Keycloak, Mailpit
-- [ ] Generate each service from start.spring.io
+### Phase 0: Setup ([guide](docs/phases/phase-0.md))
+- [x] Build tool: Maven multi-module (ADR 0001), Spring Boot 4.1 / Java 21 (ADR 0002)
+- [x] `infra/docker/docker-compose.yml` with Postgres, Redis, Kafka, Kafka UI, Keycloak, Mailpit
+- [x] Service skeletons (main class, config, smoke test) for all six services
+- [x] Codespaces devcontainer, Makefile, `.env.example`
+- [ ] **You:** generate the Maven wrapper, run `./mvnw verify` and `make up`, and check health endpoints
 
 ### Phase 1: First vertical slice
 - [ ] event-service: CRUD for events/venues, Flyway migration, seed data

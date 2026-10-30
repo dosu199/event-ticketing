@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  event-service build file.
+  Inherits Java version, Spring Boot and Spring Cloud versions from the root
+  pom.xml, so dependencies below have no <version> tags.
+  Phase 0 keeps dependencies to the minimum needed to start the app.
+  Add each new dependency in the phase where you first use it
+  (e.g. JPA + Postgres + Flyway in Phase 1) and note why in the README.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ticketing</groupId>
+        <artifactId>event-ticketing-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath> <!-- the root POM, two folders up -->
+    </parent>
+
+    <artifactId>event-service</artifactId>
+    <name>event-service</name>
+    <description>Event catalog: events, venues, seats, prices</description>
+
+    <dependencies>
+        <!-- Spring MVC + embedded Tomcat: lets this service expose REST endpoints.
+             (Called spring-boot-starter-web before Spring Boot 4.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <!-- Actuator: production-ready endpoints such as /actuator/health.
+             Docker, Kubernetes and the gateway use health checks to know
+             whether this service is alive. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- JUnit 5, AssertJ, Mockito and Spring test support.
+             scope=test: only on the classpath when running tests, never in the jar. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Packages the app as an executable "fat jar" (java -jar target/*.jar),
+                 adds `./mvnw spring-boot:run`, and can build a Docker image
+                 with `./mvnw spring-boot:build-image`. Configured by the Boot parent. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

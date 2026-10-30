@@ -2,6 +2,8 @@
 
 Single entry point for the frontend.
 
+> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+
 ## Responsibilities
 - Route `/api/<service>/**` to the right service
 - Validate JWTs issued by Keycloak

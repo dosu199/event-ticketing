@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ROOT (PARENT) POM
+  =================
+  This file does not build any application itself (packaging = pom).
+  It has two jobs:
+    1. List every service as a <module>, so `./mvnw verify` at the repo root
+       builds and tests all of them in one go.
+    2. Define shared settings (Java version, Spring Boot version, Spring Cloud
+       version) in ONE place. Each service's pom.xml inherits from this file.
+
+  See docs/adr/0001-maven-multi-module-build.md for why we chose this setup.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Inheriting from spring-boot-starter-parent gives us:
+        - managed versions for every Spring Boot starter and hundreds of common
+          libraries (Postgres driver, Flyway, Testcontainers...), so we never
+          write <version> on those dependencies;
+        - sensible plugin defaults (compiler, surefire for tests, spring-boot-maven-plugin);
+        - UTF-8 encoding, resource filtering, etc.
+      Changing this one version upgrades Spring Boot for every service.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/> <!-- look it up in Maven Central, not on disk -->
+    </parent>
+
+    <!-- Coordinates of this project. Services reuse the groupId. -->
+    <groupId>com.ticketing</groupId>
+    <artifactId>event-ticketing-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>event-ticketing-parent</name>
+    <description>Parent build for the Event Ticketing microservices</description>
+
+    <!-- Every folder listed here must contain its own pom.xml. -->
+    <modules>
+        <module>services/api-gateway</module>
+        <module>services/event-service</module>
+        <module>services/booking-service</module>
+        <module>services/payment-service</module>
+        <module>services/ticket-service</module>
+        <module>services/notification-service</module>
+    </modules>
+
+    <properties>
+        <!-- Read by spring-boot-starter-parent to configure the compiler (release 21). -->
+        <java.version>21</java.version>
+        <!-- Spring Cloud is versioned as a "release train" separate from Spring Boot.
+             2025.1.x (Oakwood) is the train compatible with Spring Boot 4.0 and 4.1. -->
+        <spring-cloud.version>2025.1.2</spring-cloud.version>
+    </properties>
+
+    <!--
+      <dependencyManagement> does NOT add any dependency to any module.
+      It only says: "if a module asks for a Spring Cloud artifact, use the
+      version from this BOM (Bill Of Materials)". Spring Boot's own BOM is
+      already included through the parent above.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -9,10 +9,13 @@
 | `observability/` | Prometheus scrape config, Grafana dashboards and datasources |
 
 ## docker-compose checklist
-- [ ] postgres (one DB per service via an init script)
-- [ ] redis
-- [ ] kafka (or redpanda) + optional UI (kafka-ui / redpanda console)
-- [ ] keycloak (+ realm import)
-- [ ] mailpit
-- [ ] prometheus, grafana, zipkin (profile `observability`)
-- [ ] services (profile `services`)
+- [x] postgres, with one DB + user per service via `docker/postgres/init/` (ADR 0004)
+- [x] redis
+- [x] kafka (KRaft, ADR 0003) + kafka-ui
+- [x] keycloak (dev mode)
+- [ ] keycloak realm import (Phase 2)
+- [x] mailpit
+- [ ] prometheus, grafana, zipkin (profile `observability`, Phase 6)
+- [ ] services as containers (profile `services`)
+
+Run it with `make up` / `make ps` / `make down` from the repo root. Each container is explained in [docs/phases/phase-0.md](../docs/phases/phase-0.md#5-the-infrastructure-infradockerdocker-composeyml), and the compose file itself is commented line by line.
