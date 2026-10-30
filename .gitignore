@@ -1,0 +1,17 @@
+# Java / build
+target/
+build/
+.gradle/
+*.class
+*.log
+# IDE
+.idea/
+*.iml
+.vscode/
+# Node
+node_modules/
+dist/
+.env
+.env.local
+# OS
+.DS_Store
