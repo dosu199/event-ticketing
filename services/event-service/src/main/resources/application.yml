@@ -11,6 +11,24 @@ spring:
     # and the gateway can use it for routing.
     name: event-service
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/event_db
+    username: event_user
+    # ${DB_PASSWORD:secret} = use env variable DB_PASSWORD if set, otherwise "secret"
+    # (the local default from SERVICE_DB_PASSWORD in .env). Never hardcode real passwords.
+    password: ${DB_PASSWORD:secret}
+
+  jpa:
+    hibernate:
+      # Hibernate only CHECKS that entities match the tables and never changes them.
+      # Flyway owns the schema through versioned migrations in db/migration/.
+      ddl-auto: validate
+    # Don't keep the DB session open for the whole HTTP request. All DB access
+    # happens inside the service layer (also removes the startup warning).
+    open-in-view: false
+    # Log the SQL Hibernate runs. Useful while learning, off in production.
+    show-sql: true    
+
 server:
   # Each service gets its own fixed port (see the port table in the root README)
   # so they can all run on one machine at the same time.
