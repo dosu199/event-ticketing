@@ -2,21 +2,11 @@ package com.ticketing.event;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-/**
- * Entry point of event-service.
- *
- * <p>{@code @SpringBootApplication} combines three annotations:
- * <ul>
- *   <li>{@code @Configuration}: this class can define Spring beans.</li>
- *   <li>{@code @EnableAutoConfiguration}: Spring Boot configures things based on
- *       the jars on the classpath (e.g. Tomcat because the web starter is present).</li>
- *   <li>{@code @ComponentScan}: finds {@code @Component}, {@code @Service},
- *       {@code @RestController}... in this package and all sub-packages.
- *       That's why this class sits at the ROOT package {@code com.ticketing.event},
- *       above the api/domain/service/... sub-packages.</li>
- * </ul>
- */
 @SpringBootApplication
 public class EventServiceApplication {
 
