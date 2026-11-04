@@ -1,0 +1,121 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-8);
+  margin-bottom: var(--space-8);
+  border-radius: var(--radius-lg);
+  color: #fff;
+  background:
+    radial-gradient(70% 120% at 100% 0%, rgb(255 166 77 / 0.55), transparent 60%),
+    radial-gradient(60% 100% at 0% 100%, rgb(140 40 120 / 0.65), transparent 70%),
+    linear-gradient(120deg, #2a1a3d, #c2410c);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 40px solid rgb(255 255 255 / 0.07);
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.heading {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+  font-weight: 800;
+  line-height: 1.05;
+  max-width: 16ch;
+}
+
+.subheading {
+  max-width: 52ch;
+  font-size: 1.05rem;
+  opacity: 0.88;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--color-text);
+}
+
+.chipActive {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-bg);
+}
+
+.count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  background: var(--color-surface-2);
+  color: var(--color-muted);
+}
+
+.chipActive .count {
+  background: rgb(255 255 255 / 0.2);
+  color: inherit;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: var(--space-8) var(--space-6);
+  }
+}
