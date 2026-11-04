@@ -3,26 +3,28 @@ import { StatusMessage } from '../components/StatusMessage'
 import { EventCard } from '../features/events/components/EventCard'
 import { EventCardSkeleton } from '../features/events/components/EventCardSkeleton'
 import { statusLabel } from '../features/events/format'
-import { useEvents } from '../features/events/queries'
+import { useEventsInfinite } from '../features/events/queries'
 import type { EventStatus } from '../features/events/types'
 import styles from './EventListPage.module.css'
 
-const SKELETON_COUNT = 3
+const SKELETON_COUNT = 6
 const FILTERS: ReadonlyArray<EventStatus | 'ALL'> = ['ALL', 'PUBLISHED', 'DRAFT', 'CANCELLED']
+const countFormat = new Intl.NumberFormat()
 
-function isFilter(value: string | null): value is EventStatus {
+function isStatus(value: string | null): value is EventStatus {
   return value === 'PUBLISHED' || value === 'DRAFT' || value === 'CANCELLED'
 }
 
 export function EventListPage() {
-  const { data: events, isPending, isError, error, refetch } = useEvents()
   const [searchParams, setSearchParams] = useSearchParams()
   const statusParam = searchParams.get('status')
-  const activeFilter: EventStatus | 'ALL' = isFilter(statusParam) ? statusParam : 'ALL'
+  const status = isStatus(statusParam) ? statusParam : undefined
 
-  const visible = events?.filter((e) => activeFilter === 'ALL' || e.status === activeFilter) ?? []
-  const countFor = (filter: EventStatus | 'ALL') =>
-    filter === 'ALL' ? (events?.length ?? 0) : (events?.filter((e) => e.status === filter).length ?? 0)
+  const { data, isPending, isError, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isPlaceholderData } =
+    useEventsInfinite({ status })
+
+  const events = data?.pages.flatMap((page) => page.content) ?? []
+  const total = data?.pages[0]?.totalElements ?? 0
 
   const selectFilter = (filter: EventStatus | 'ALL') => {
     setSearchParams(filter === 'ALL' ? {} : { status: filter }, { replace: true })
@@ -41,26 +43,26 @@ export function EventListPage() {
       </section>
 
       <div className={styles.toolbar}>
-        <h2 className={styles.sectionTitle}>All events</h2>
-        {events && events.length > 0 && (
-          <div className={styles.filters} role="group" aria-label="Filter by status">
-            {FILTERS.map((filter) => {
-              const active = filter === activeFilter
-              return (
-                <button
-                  key={filter}
-                  type="button"
-                  className={`${styles.chip} ${active ? styles.chipActive : ''}`}
-                  aria-pressed={active}
-                  onClick={() => selectFilter(filter)}
-                >
-                  {filter === 'ALL' ? 'All' : statusLabel[filter]}
-                  <span className={styles.count}>{countFor(filter)}</span>
-                </button>
-              )
-            })}
-          </div>
-        )}
+        <div className={styles.titleGroup}>
+          <h2 className={styles.sectionTitle}>{status ? statusLabel[status] : 'All events'}</h2>
+          {data && <span className={styles.total}>{countFormat.format(total)} events</span>}
+        </div>
+        <div className={styles.filters} role="group" aria-label="Filter by status">
+          {FILTERS.map((filter) => {
+            const active = (filter === 'ALL' && !status) || filter === status
+            return (
+              <button
+                key={filter}
+                type="button"
+                className={`${styles.chip} ${active ? styles.chipActive : ''}`}
+                aria-pressed={active}
+                onClick={() => selectFilter(filter)}
+              >
+                {filter === 'ALL' ? 'All' : statusLabel[filter]}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {isPending ? (
@@ -75,18 +77,36 @@ export function EventListPage() {
         <StatusMessage title="Couldn't load events" variant="error" onRetry={() => void refetch()}>
           {error.message}
         </StatusMessage>
-      ) : visible.length === 0 ? (
-        <StatusMessage title={events.length === 0 ? 'No events yet' : 'No events match this filter'}>
-          {events.length === 0 ? 'Check back soon for new events.' : 'Try another status filter.'}
+      ) : events.length === 0 ? (
+        <StatusMessage title={status ? 'No events with this status' : 'No events yet'}>
+          {status ? 'Try another status filter.' : 'Check back soon for new events.'}
         </StatusMessage>
       ) : (
-        <ul className={styles.grid}>
-          {visible.map((event) => (
-            <li key={event.id}>
-              <EventCard event={event} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className={`${styles.grid} ${isPlaceholderData ? styles.stale : ''}`} aria-busy={isPlaceholderData}>
+            {events.map((event) => (
+              <li key={event.id}>
+                <EventCard event={event} />
+              </li>
+            ))}
+          </ul>
+
+          <div className={styles.more}>
+            <p className={styles.progress} aria-live="polite">
+              Showing {countFormat.format(events.length)} of {countFormat.format(total)}
+            </p>
+            {hasNextPage && !isPlaceholderData && (
+              <button
+                type="button"
+                className={styles.moreButton}
+                onClick={() => void fetchNextPage()}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? 'Loading…' : 'Load more events'}
+              </button>
+            )}
+          </div>
+        </>
       )}
     </>
   )

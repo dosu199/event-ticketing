@@ -1,16 +1,21 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
-import { fetchEvent, fetchEvents } from './api'
+import { infiniteQueryOptions, keepPreviousData, queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { fetchEvent, fetchEventsPage, type EventListParams } from './api'
 
 export const eventKeys = {
   all: ['events'] as const,
-  list: () => [...eventKeys.all, 'list'] as const,
+  lists: () => [...eventKeys.all, 'list'] as const,
+  list: (params: EventListParams) => [...eventKeys.lists(), params] as const,
   detail: (id: number) => [...eventKeys.all, 'detail', id] as const,
 }
 
-export const eventsQuery = () =>
-  queryOptions({
-    queryKey: eventKeys.list(),
-    queryFn: ({ signal }) => fetchEvents(signal),
+export const eventsInfiniteQuery = (params: EventListParams) =>
+  infiniteQueryOptions({
+    queryKey: eventKeys.list(params),
+    queryFn: ({ pageParam, signal }) => fetchEventsPage(params, pageParam, signal),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.page + 1),
+    // While a new filter loads, keep showing the previous results instead of a skeleton.
+    placeholderData: keepPreviousData,
   })
 
 export const eventQuery = (id: number) =>
@@ -19,8 +24,8 @@ export const eventQuery = (id: number) =>
     queryFn: ({ signal }) => fetchEvent(id, signal),
   })
 
-export function useEvents() {
-  return useQuery(eventsQuery())
+export function useEventsInfinite(params: EventListParams) {
+  return useInfiniteQuery(eventsInfiniteQuery(params))
 }
 
 export function useEvent(id: number | null) {

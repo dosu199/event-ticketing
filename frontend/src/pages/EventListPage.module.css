@@ -89,20 +89,49 @@
   color: var(--color-bg);
 }
 
-.count {
-  min-width: 20px;
-  padding: 0 6px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  background: var(--color-surface-2);
-  color: var(--color-muted);
+.titleGroup {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
 }
 
-.chipActive .count {
-  background: rgb(255 255 255 / 0.2);
-  color: inherit;
+.total {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.more {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.progress {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+.moreButton {
+  min-width: 220px;
+  padding: 12px var(--space-6);
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.moreButton:hover:not(:disabled) {
+  border-color: var(--color-text);
+}
+
+.moreButton:disabled {
+  cursor: progress;
+  opacity: 0.7;
 }
 
 .grid {
@@ -118,4 +147,9 @@
   .hero {
     padding: var(--space-8) var(--space-6);
   }
+}
+
+.stale {
+  opacity: 0.55;
+  transition: opacity 150ms ease;
 }
