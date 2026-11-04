@@ -7,7 +7,7 @@
 COMPOSE = docker compose -f infra/docker/docker-compose.yml --env-file .env
 
 # .PHONY: these targets are command names, not files to build.
-.PHONY: help env up down ps logs reset build test
+.PHONY: help env up down ps logs reset build test dev dev-down
 
 help: ## List available targets
 	@grep -E "^[a-zA-Z_-]+:.*## " $(MAKEFILE_LIST) | awk -F":.*## " '{printf "  %-8s %s\n", $$1, $$2}'
@@ -35,3 +35,9 @@ build: ## Compile and package all services, skipping tests
 
 test: ## Build and run all tests
 	./mvnw verify
+
+dev: ## Start infra + all services + frontend (Ctrl+C stops)
+	./scripts/dev.sh
+
+dev-down: ## Same as dev, but also stop containers on exit
+	./scripts/dev.sh --down
