@@ -1,41 +1,40 @@
 # booking-service  (port 8082)
 
-The heart of the system. Handles seat holds, bookings, and orchestrates the booking saga.
+Seat availability and seat holds. Later: bookings and the booking saga.
 
-> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+> **Current state (Phase 3, part 1):** availability + 10-minute holds in Redis, atomic via Lua,
+> with a temporary guest id. Details: [docs/phases/phase-3-seat-holds.md](../../docs/phases/phase-3-seat-holds.md),
+> decision: [ADR 0006](../../docs/adr/0006-seat-holds-in-redis-with-lua.md).
 
-## Owned data
-- **Redis:** seat holds `hold:{eventId}:{seatId}` → userId, TTL 10 min
-- **Postgres (`booking_db`):**
-  - `booking`: user, event, status, total, `version` (optimistic lock)
-  - `booking_seat`: booking, seat
-  - `outbox`: events waiting to be published to Kafka
+## Data
+- **Redis** (holds, temporary):
+  - `hold:event:{eventId}`: hash seatId → holdId, each field with its own expiry
+  - `hold:{holdId}`: userId, eventId, seatIds, expiresAt
+  - `hold:user:{eventId}:{userId}`: the user's active holdId
+- **PostgreSQL `booking_db`**: not used yet (confirmed bookings + outbox in Phase 4)
 
-## Booking state machine
+## API (through the gateway: `/api/booking/...`)
+| Method | Path |
+|---|---|
+| GET | `/events/{eventId}/availability` |
+| POST | `/holds` |
+| GET | `/holds/{holdId}` |
+| DELETE | `/holds/{holdId}` |
+
+## Depends on
+- Redis (`make up`)
+- event-service on `services.event-service.url` (default `http://localhost:8081`)
+
+## Run / test
+```bash
+./mvnw -pl services/booking-service spring-boot:run
+./mvnw -pl services/booking-service verify     # needs Docker
 ```
-PENDING ──► AWAITING_PAYMENT ──► CONFIRMED
-   │               │
-   └──► EXPIRED    └──► CANCELLED (payment failed → release seats)
-```
-
-## Planned API
-| Method | Path | Notes |
-|---|---|---|
-| POST | `/bookings/holds` | Hold seats (must not double-book) |
-| DELETE | `/bookings/holds/{id}` | Release hold |
-| POST | `/bookings` | Create booking from hold, start saga |
-| GET | `/bookings/{id}` | Status |
-| GET | `/bookings/me` | My bookings |
-
-## Events
-- Publishes: `SeatsHeld`, `SeatsReleased`, `BookingCreated`, `PaymentRequested`, `BookingConfirmed`, `BookingCancelled`
-- Consumes: `PaymentSucceeded`, `PaymentFailed`
 
 ## Checklist
-- [ ] Redis seat hold logic (atomic, TTL)
-- [ ] Booking entity with `@Version`
-- [ ] State machine
-- [ ] Saga orchestration and compensation
-- [ ] Outbox table and publisher
-- [ ] Hold-expiry handling
-- [ ] Concurrency test: many threads, same seat
+- [x] Redis seat holds (atomic, TTL)
+- [x] Availability endpoint
+- [x] Concurrency test: many threads, same seat
+- [ ] Replace guest id with Keycloak user (Phase 2)
+- [ ] Booking entity with `@Version`, state machine (Phase 4)
+- [ ] Saga orchestration + compensation, outbox (Phase 4)
