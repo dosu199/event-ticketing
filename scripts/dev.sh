@@ -20,6 +20,7 @@ STOP_CONTAINERS=false
 # name | port | URL to poll until ready | command
 SERVICES=(
   "event-service|8081|http://localhost:8081/actuator/health|./mvnw -q -pl services/event-service spring-boot:run"
+  "booking-service|8082|http://localhost:8082/actuator/health|./mvnw -q -pl services/booking-service spring-boot:run"
   "api-gateway|8080|http://localhost:8080/actuator/health|./mvnw -q -pl services/api-gateway spring-boot:run"
   "frontend|5173|http://localhost:5173|npm --prefix frontend run dev"
 )
@@ -126,6 +127,7 @@ $(printf '\033[1;32m')All up.$(printf '\033[0m') Press Ctrl+C to stop.
   Frontend          http://localhost:5173
   API (gateway)     http://localhost:8080/api/events
   event-service     http://localhost:8081/actuator/health
+  booking-service   http://localhost:8082/actuator/health
   Keycloak          http://localhost:8180   (admin / admin)
   Mailpit           http://localhost:8025
   Kafka UI          http://localhost:8090

@@ -1,7 +1,7 @@
 # =============================================================
 # api-gateway configuration
 # Single entry point for the frontend: routes /api/** to services
-# and applies CORS. See docs/phases for details.
+# and applies CORS.
 # =============================================================
 
 spring:
@@ -13,13 +13,23 @@ spring:
       server:
         webflux:
           routes:
-            # /api/events and /api/events/** -> event-service, "/api" stripped
+            # /api/events/**  -> event-service  /events/**   ("/api" stripped)
             - id: event-service
               uri: http://localhost:8081
               predicates:
                 - Path=/api/events,/api/events/**
               filters:
                 - StripPrefix=1
+
+            # /api/booking/** -> booking-service /**   ("/api/booking" stripped)
+            #   /api/booking/events/1/availability -> /events/1/availability
+            #   /api/booking/holds                 -> /holds
+            - id: booking-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/booking/**
+              filters:
+                - StripPrefix=2
 
           # Only the React dev server may call the API from a browser.
           globalcors:
@@ -44,7 +54,6 @@ management:
   endpoints:
     web:
       exposure:
-        # health, info, and gateway (lists the active routes)
         include: health,info,gateway
   endpoint:
     health:
