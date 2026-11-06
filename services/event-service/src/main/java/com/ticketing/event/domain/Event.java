@@ -14,6 +14,16 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 
+/**
+ * Something people buy tickets for. Maps to table "event" (V1 migration).
+ *
+ * <p>Status changes only through publish() and cancel(), which enforce the lifecycle:
+ * <pre>
+ *   DRAFT ──publish()──► PUBLISHED
+ *     │                     │
+ *     └──────cancel()───────┴──► CANCELLED   (final)
+ * </pre>
+ */
 @Entity
 @Table(name = "event")
 public class Event {
@@ -50,7 +60,33 @@ public class Event {
         this.title = title;
         this.description = description;
         this.startTime = startTime;
-        this.status = EventStatus.DRAFT;  
+        this.status = EventStatus.DRAFT;
+    }
+
+    /**
+     * Puts the event on sale. Only drafts can be published, and only while the event
+     * is still in the future.
+     */
+    public void publish(Instant now) {
+        if (status != EventStatus.DRAFT) {
+            throw new InvalidEventStateException(
+                    "Event " + id + " is " + status + "; only DRAFT events can be published");
+        }
+        if (!startTime.isAfter(now)) {
+            throw new InvalidEventStateException(
+                    "Event " + id + " starts in the past and can't be published");
+        }
+        this.status = EventStatus.PUBLISHED;
+    }
+
+    /**
+     * Cancels a draft or published event. Cancelling is final.
+     */
+    public void cancel() {
+        if (status == EventStatus.CANCELLED) {
+            throw new InvalidEventStateException("Event " + id + " is already cancelled");
+        }
+        this.status = EventStatus.CANCELLED;
     }
 
     public Long getId() {

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   event-service build file.
-  Inherits Java version, Spring Boot and Spring Cloud versions from the root
-  pom.xml, so dependencies below have no <version> tags.
-  Phase 0 keeps dependencies to the minimum needed to start the app.
-  Add each new dependency in the phase where you first use it
-  (e.g. JPA + Postgres + Flyway in Phase 1) and note why in the README.
+  Inherits Java, Spring Boot and Spring Cloud versions from the root pom.xml,
+  so dependencies below have no <version> tags.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,7 +13,7 @@
         <groupId>com.ticketing</groupId>
         <artifactId>event-ticketing-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath> <!-- the root POM, two folders up -->
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>event-service</artifactId>
@@ -24,36 +21,39 @@
     <description>Event catalog: events, venues, seats, prices</description>
 
     <dependencies>
-        <!-- Spring MVC + embedded Tomcat: lets this service expose REST endpoints.
-             (Called spring-boot-starter-web before Spring Boot 4.) -->
+        <!-- REST endpoints (Spring MVC + embedded Tomcat). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
-        <!-- Actuator: production-ready endpoints such as /actuator/health.
-             Docker, Kubernetes and the gateway use health checks to know
-             whether this service is alive. -->
+
+        <!-- Health endpoint (/actuator/health) used by dev.sh, Docker and later Kubernetes. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- JUnit 5, AssertJ, Mockito and Spring test support.
-             scope=test: only on the classpath when running tests, never in the jar. -->
+        <!-- Bean Validation (@NotBlank, @Future, ...) for request bodies marked @Valid. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+
+        <!-- JPA/Hibernate entities and Spring Data repositories. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- PostgreSQL JDBC driver. runtime: our code never imports it directly. -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Flyway runs db/migration/V*.sql at startup. Spring Boot 4 needs the starter
+             for auto-configuration; the second artifact adds PostgreSQL support. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
@@ -62,17 +62,27 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
+
+        <!-- ===== Test-only ===== -->
+
+        <!-- JUnit 5, AssertJ, Hamcrest, Mockito, MockMvc, JsonPath. -->
         <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Starts a real PostgreSQL in Docker for integration tests (Testcontainers 2.x;
+             version managed by Spring Boot). Requires Docker, which the Codespace has. -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Packages the app as an executable "fat jar" (java -jar target/*.jar),
-                 adds `./mvnw spring-boot:run`, and can build a Docker image
-                 with `./mvnw spring-boot:build-image`. Configured by the Boot parent. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

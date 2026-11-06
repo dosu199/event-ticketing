@@ -1,32 +1,46 @@
 # event-service  (port 8081)
 
-Owns the event catalog: events, venues, seat layouts, prices.
+Owns the event catalog: venues, events, seats and prices.
 
-> **Current state (Phase 0):** skeleton only. It starts and answers `GET /actuator/health`. See [Phase 0 guide](../../docs/phases/phase-0.md).
+> **Current state (end of Phase 1):** full read/write API with validation, lifecycle rules,
+> Problem Details errors, pagination, and Testcontainers integration tests.
+> Details: [docs/phases/phase-1.md](../../docs/phases/phase-1.md).
 
-## Owned data (Postgres: `event_db`)
-- `venue`: name, address, seating layout (rows/seats or sections)
-- `event`: title, description, venue, start time, status (DRAFT/PUBLISHED/CANCELLED)
-- `seat`: event, row, number, category, price
+## Data (PostgreSQL `event_db`, user `event_user`)
+- `venue`: name, city, address
+- `event`: venue, title, description, start time, status (`DRAFT` / `PUBLISHED` / `CANCELLED`)
+- `seat`: event, row, number, category (`STANDARD` / `VIP`), price
 
-## Planned API
-| Method | Path | Role |
+Schema is owned by Flyway (`src/main/resources/db/migration`); Hibernate only validates it.
+
+## API
+| Method | Path | Notes |
 |---|---|---|
-| GET | `/events` | public (paging, filtering) |
-| GET | `/events/{id}` | public |
-| GET | `/events/{id}/seats` | public |
-| POST | `/events` | ORGANIZER |
-| PUT | `/events/{id}` | ORGANIZER |
-| POST | `/events/{id}/publish` | ORGANIZER |
+| GET | `/events?status=&page=&size=` | paged, sorted by start time |
+| GET | `/events/{id}` | |
+| GET | `/events/{id}/seats` | ordered by row and number |
+| POST | `/events` | creates a DRAFT, 201 + Location |
+| POST | `/events/{id}/publish` | DRAFT → PUBLISHED (future events only) |
+| POST | `/events/{id}/cancel` | DRAFT/PUBLISHED → CANCELLED |
 
-## Events
-- Publishes: `EventPublished`, `EventCancelled`
-- Consumes: nothing initially
+Errors: Problem Details (`application/problem+json`), see ADR 0005.
 
-## Checklist
-- [ ] Entities and Flyway `V1__init.sql`
-- [ ] Seed data migration
-- [ ] Repositories and service layer
-- [ ] Controllers, DTOs, validation, error handling
-- [ ] Security (roles)
-- [ ] Integration test with Testcontainers
+## Run / test
+```bash
+./mvnw -pl services/event-service spring-boot:run   # needs `make up` (Postgres)
+./mvnw -pl services/event-service verify            # needs Docker (Testcontainers)
+```
+
+## Packages
+| Package | Contents |
+|---|---|
+| `api` | `EventController`, request/response records, `GlobalExceptionHandler` |
+| `service` | `EventService` (use cases, transactions), not-found exceptions |
+| `repository` | Spring Data repositories |
+| `domain` | Entities, enums, lifecycle rules, `InvalidEventStateException` |
+| `config` | `ClockConfig` |
+
+## Next (Phase 2)
+- [ ] Validate JWTs from Keycloak; ORGANIZER role for create/publish/cancel
+- [ ] Public list returns only PUBLISHED events
+- [ ] Publish `EventPublished` / `EventCancelled` to Kafka (Phase 4)
