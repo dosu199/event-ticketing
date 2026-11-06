@@ -1,11 +1,12 @@
 import { infiniteQueryOptions, keepPreviousData, queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { fetchEvent, fetchEventsPage, type EventListParams } from './api'
+import { fetchEvent, fetchEventsPage, fetchSeats, type EventListParams } from './api'
 
 export const eventKeys = {
   all: ['events'] as const,
   lists: () => [...eventKeys.all, 'list'] as const,
   list: (params: EventListParams) => [...eventKeys.lists(), params] as const,
   detail: (id: number) => [...eventKeys.all, 'detail', id] as const,
+  seats: (id: number) => [...eventKeys.detail(id), 'seats'] as const,
 }
 
 export const eventsInfiniteQuery = (params: EventListParams) =>
@@ -30,4 +31,14 @@ export function useEventsInfinite(params: EventListParams) {
 
 export function useEvent(id: number | null) {
   return useQuery({ ...eventQuery(id ?? 0), enabled: id !== null })
+}
+
+export const seatsQuery = (eventId: number) =>
+  queryOptions({
+    queryKey: eventKeys.seats(eventId),
+    queryFn: ({ signal }) => fetchSeats(eventId, signal),
+  })
+
+export function useSeats(eventId: number | null) {
+  return useQuery({ ...seatsQuery(eventId ?? 0), enabled: eventId !== null })
 }

@@ -1,0 +1,43 @@
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface-2);
+}
+
+.name {
+  font-weight: 600;
+}
+
+.count {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.price {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.from {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+}
+
+.from strong {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-text);
+}

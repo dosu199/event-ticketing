@@ -1,6 +1,6 @@
 import { getJson } from '../../api/http'
 import type { PageResponse } from '../../api/types'
-import type { EventStatus, EventSummary } from './types'
+import type { EventStatus, EventSummary, Seat } from './types'
 
 // 24 fills complete rows in 2-, 3- and 4-column layouts.
 export const EVENTS_PAGE_SIZE = 24
@@ -21,4 +21,8 @@ export function fetchEventsPage(
 
 export function fetchEvent(id: number, signal?: AbortSignal): Promise<EventSummary> {
   return getJson<EventSummary>(`/api/events/${id}`, signal)
+}
+
+export function fetchSeats(eventId: number, signal?: AbortSignal): Promise<Seat[]> {
+  return getJson<Seat[]>(`/api/events/${eventId}/seats`, signal)
 }

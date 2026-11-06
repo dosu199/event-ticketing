@@ -14,3 +14,13 @@ export interface EventSummary {
   status: EventStatus
   venue: VenueSummary
 }
+
+export type SeatCategory = 'STANDARD' | 'VIP'
+
+export interface Seat {
+  id: number
+  rowLabel: string
+  seatNumber: number
+  category: SeatCategory
+  price: number
+}

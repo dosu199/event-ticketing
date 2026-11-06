@@ -148,8 +148,16 @@
   font-weight: 700;
   background: var(--color-accent);
   color: var(--color-accent-contrast);
-  cursor: not-allowed;
-  opacity: 0.55;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cta:hover {
+  background: var(--color-accent-hover);
+}
+
+.section {
+  scroll-margin-top: 88px;
 }
 
 .notice {
